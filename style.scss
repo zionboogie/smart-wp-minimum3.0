@@ -1,0 +1,53 @@
+@charset "UTF-8";
+
+/*
+Theme Name:		SMART-MINIMUM
+Theme URI:		https://rfs.jp/
+Description:	最小限必要と思われる構成のテンプレート
+Author:			rhythmfactory
+Author URI:		https://rfs.jp/
+Version:		2.0
+License:
+License URI:	http://www.gnu.org/licenses/gpl-2.0.html
+*/
+
+
+/*#########################################################
+
+読み込み
+
+#########################################################*/
+// リセットCSS（ress.css）
+@import "_src/asset/css/base/ress.scss";
+// 変数・mixin
+@import "_src/asset/css/base/generic.scss";
+// 要素のデフォルト
+@import "_src/asset/css/base/base.scss";
+// よく使うグローバルなElements集
+@import "_src/asset/css/base/global.scss";
+
+
+/* ========================================================
+よく使うComponents
+=========================================================*/
+// ボタン
+@import "_src/asset/css/components/default-button.scss";
+// リスト
+@import "_src/asset/css/components/default-list.scss";
+// 一覧用タイトル（下ボーダー）
+@import "_src/asset/css/components/default-title.scss";
+
+/* ========================================================
+Components
+=========================================================*/
+// ヘッダ
+@import "_src/asset/css/components/site-header.scss";
+// フッタ
+@import "_src/asset/css/components/site-footer.scss";
+
+// メインコンテンツ、左カラムを含むラッパー
+@import "_src/asset/css/components/main-container.scss";
+// 記事の一覧
+@import "_src/asset/css/components/entrylist-container.scss";
+// サイドバー
+@import "_src/asset/css/components/sidebar-container.scss";

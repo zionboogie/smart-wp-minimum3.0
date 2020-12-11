@@ -1,0 +1,28 @@
+/* ========================================================
+メインコンテンツ、左カラムを含むラッパー
+=========================================================*/
+.main-container{
+	display: flex;
+	flex-wrap: wrap;
+	padding: $mg;
+	// トピックパス
+	>.breadcrumb{
+		flex-shrink: 0;
+		margin-bottom: $mg*2;
+		width: 100%;
+	}
+	// 記事領域
+	>.entrylist-contaier{
+		flex-grow: 2;
+		margin-right: $mg*5;
+		@include mq(md){
+			margin-right: 0;
+			width: 100%;
+		}
+	}
+	// サイドバー領域
+	>.sidebar-container{
+		flex-shrink: 0;
+		width: 300px;
+	}
+}
