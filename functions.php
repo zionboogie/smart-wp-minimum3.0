@@ -1,6 +1,9 @@
 <?php
 /*
-テーマのための関数
+* テーマのための関数
+* @package WordPress
+* @subpackage smart
+* @since 3.0.0
 */
 
 /*#########################################################
@@ -8,91 +11,119 @@
 基本設定
 
 #########################################################*/
-add_action( 'after_setup_theme', 'smart_theme_support' );
-function smart_theme_support() {
 
-	/* ========================================================
-	セキュリティ
-	=========================================================*/
-	// WordPressのバージョンを非表示
-	remove_action('wp_head','wp_generator');
+if ( ! function_exists( 'smart_theme_support' ) ) {
+	add_action( 'after_setup_theme', 'smart_theme_support' );
+	function smart_theme_support() {
+	
+		/* ========================================================
+		セキュリティ
+		=========================================================*/
+		// WordPressのバージョンを非表示
+		remove_action('wp_head','wp_generator');
+	
+		// プラグインのバージョン情報非表示
+		function remove_cssjs_ver2( $src ) {
+			// テーマ内のファイルは対象外
+			if ( strpos( $src, 'ver=' ) && !strpos( $src, get_template() ) )
+				$src = remove_query_arg( 'ver', $src );
+			return $src;
+		}
+		add_filter( 'style_loader_src', 'remove_cssjs_ver2', 9999 );
+		add_filter( 'script_loader_src', 'remove_cssjs_ver2', 9999 );
+	
+		// headタグのmeta（generator）タグを取り除く
+		foreach ( array( 'rss2_head', 'commentsrss2_head', 'rss_head', 'rdf_header',
+			'atom_head', 'comments_atom_head', 'opml_head', 'app_head' ) as $action ) {
+			if ( has_action( $action, 'the_generator' ) )
+				remove_action( $action, 'the_generator' );
+		}
+	
+		// コメント用のフィードを停止
+		if ( is_comment_feed() ) {
+			remove_action('do_feed_rdf', 'do_feed_rdf');
+			remove_action('do_feed_rss', 'do_feed_rss');
+			remove_action('do_feed_rss2', 'do_feed_rss2');
+			remove_action('do_feed_atom', 'do_feed_atom');
+			remove_action('wp_head', 'feed_links_extra', 3);
+		}
 
-	// プラグインのバージョン情報非標示
-	function remove_cssjs_ver2( $src ) {
-		if ( strpos( $src, 'ver=' ) )
-			$src = remove_query_arg( 'ver', $src );
-		return $src;
+		// 絵文字削除
+		remove_action('wp_head', 'print_emoji_detection_script', 7);
+		remove_action('admin_print_scripts', 'print_emoji_detection_script');
+		remove_action('wp_print_styles', 'print_emoji_styles' );
+		remove_action('admin_print_styles', 'print_emoji_styles');
+
+		// Microsoftが提供するブログエディター「Windows Live Writer」を使用する際のマニフェストファイル
+		remove_action( 'wp_head', 'wlwmanifest_link' );
+	
+		// RSD用のxml（外部サービスを使ってサイトを運営する予定がある場合はコメントアウト）
+		remove_action('wp_head', 'rsd_link');
+
+		// oEmbed 機能に必要なリンク
+		remove_action('wp_head','rest_output_link_wp_head');
+		remove_action('wp_head','wp_oembed_add_discovery_links');
+		remove_action('wp_head','wp_oembed_add_host_js');
+
+		/* ========================================================
+		基本設定
+		=========================================================*/
+		// フィードのlink要素を自動出力する
+		add_theme_support( 'automatic-feed-links' );
+		
+		// ドキュメントのタイトルをWordPressに管理させる
+		// ドキュメントヘッドにハードコードされた<title>タグを使用しません。
+		// WordPressが提供してくれます。
+		add_theme_support( 'title-tag' );
+
+		// WordPressコアから出力されるHTMLタグをHTML5のフォーマットにする
+		add_theme_support( 'html5', array(
+			'comment-form',
+			'comment-list',
+			'gallery',
+			'caption',
+			'style',
+			'script',
+			'navigation-widgets',
+			'search-form',
+		) );
+
+		// アイキャッチ画像のサポート
+		add_theme_support( 'post-thumbnails' );
+
+		// ブロックスタイルのサポート
+		// テーマで定義するためコメントアウト
+		// add_theme_support( 'wp-block-styles' );
+
+		// 管理画面のエディタ用スタイルのサポート
+		add_theme_support( 'editor-styles' );
+		$editor_stylesheet_path = './src/asset/css/style-editor.css';
+		add_editor_style( $editor_stylesheet_path );
+
+		// 投稿ページにてアイキャッチ画像の欄を表示
+		// add_theme_support( 'post-thumbnails' );
+	
+		// 投稿フォーマットのサポート
+		// add_theme_support( 'post-formats', array(
+		// 	'aside',	//アサイド
+		// 	'gallery',	//ギャラリー
+		// 	'image',	//画像
+		// 	'link',		//リンク
+		// 	'quote',	//引用
+		// 	'status',	//ステータス
+		// 	'video',	//動画
+		// 	'audio',	//音声
+		// 	'chat',		//チャット
+		// ) );
+	
+		// 記事の自動整形（ダブルクオーテーションなどの引用符など）を無効にする
+		add_filter( 'run_wptexturize', '__return_false' );
+	
+
+	
 	}
-	add_filter( 'style_loader_src', 'remove_cssjs_ver2', 9999 );
-	add_filter( 'script_loader_src', 'remove_cssjs_ver2', 9999 );
-
-	// headタグのmeta（generator）タグを取り除く
-	foreach ( array( 'rss2_head', 'commentsrss2_head', 'rss_head', 'rdf_header',
-		'atom_head', 'comments_atom_head', 'opml_head', 'app_head' ) as $action ) {
-		if ( has_action( $action, 'the_generator' ) )
-			remove_action( $action, 'the_generator' );
-	}
-
-
-	/* ========================================================
-	基本設定
-	=========================================================*/
-	// フィードのlink要素を自動出力する
-	add_theme_support( 'automatic-feed-links' );
-
-	// コメント用のフィードを停止
-	if ( is_comment_feed() ) {
-		remove_action('do_feed_rdf', 'do_feed_rdf');
-		remove_action('do_feed_rss', 'do_feed_rss');
-		remove_action('do_feed_rss2', 'do_feed_rss2');
-		remove_action('do_feed_atom', 'do_feed_atom');
-		remove_action('wp_head', 'feed_links_extra', 3);
-	}
-
-	// WordPressコアから出力されるHTMLタグをHTML5のフォーマットにする
-	add_theme_support( 'html5', array(
-		'search-form',
-		'comment-form',
-		'comment-list',
-		'gallery',
-		'caption',
-	) );
-
-	// 投稿ページにてアイキャッチ画像の欄を表示
-	// add_theme_support( 'post-thumbnails' );
-
-	// 絵文字削除
-	remove_action('wp_head', 'print_emoji_detection_script', 7);
-	remove_action('admin_print_scripts', 'print_emoji_detection_script');
-	remove_action('wp_print_styles', 'print_emoji_styles' );
-	remove_action('admin_print_styles', 'print_emoji_styles');
-
-	// 投稿フォーマットのサポート
-	// add_theme_support( 'post-formats', array(
-	// 	'aside',	//アサイド
-	// 	'gallery',	//ギャラリー
-	// 	'image',	//画像
-	// 	'link',		//リンク
-	// 	'quote',	//引用
-	// 	'status',	//ステータス
-	// 	'video',	//動画
-	// 	'audio',	//音声
-	// 	'chat',		//チャット
-	// ) );
-
-	// 記事の自動整形（ダブルクオーテーションなどの引用符など）を無効にする
-	add_filter( 'run_wptexturize', '__return_false' );
-
-	// 管理画面左カラムにウィジェット追加
-	register_sidebar(array(
-		'id'			=> 'sidebar-1',
-		'before_widget'	=> '<div id="%1$s" class="widget %2$s">',
-		'after_widget'	=> '</div>',
-		'before_title'	=> '<h3>',
-		'after_title'	=> '</h3>',
-	));
-
 }
+
 
 
 
@@ -102,16 +133,6 @@ function smart_theme_support() {
 汎用関数
 
 #########################################################*/
-
-// TITLE要素用
-function my_wp_title($title) {
-	if( is_front_page() && is_home() ){
-		return get_bloginfo('name');
-	} else {
-		return $title."|". get_bloginfo('name');
-	}
-}
-add_filter( 'wp_title', 'my_wp_title');
 
 // 日付の出力
 function smart_entry_date() {
@@ -150,23 +171,49 @@ function smart_entry_tag($pretag="", $endtag="") {
 #########################################################*/
 
 /* ========================================================
-CSSの読み込み
+ウィジェットの追加
 =========================================================*/
-function my_enqueue_files() {
-	// CSSディレクトリ
-	$uri =  "https://".$_SERVER["HTTP_HOST"]."/common/css/";
+function smart_widgets_init() {
+	// 管理画面左カラムにウィジェット追加
+	register_sidebar(array(
+		'id'			=> 'sidebar-1',
+		'before_widget'	=> '<div id="%1$s" class="widget %2$s">',
+		'after_widget'	=> '</div>',
+		'before_title'	=> '<h3>',
+		'after_title'	=> '</h3>',
+	));
+}
+add_action( 'widgets_init', 'smart_widgets_init' );
 
+
+/* ========================================================
+CSSとJSの読み込み
+=========================================================*/
+function smart_enqueue_files() {
 /*
-ディレクトリ単位でCSSを変更したい場合
+ディレクトリ単位でCSSを変更したい場合のサンプル
 */
 /*
-	// クエリを削除
+	// CSSディレクトリ
+	$uri = get_template_directory_uri() . "/common/css/";
+
+	// クエリパラメータを削除
 	$url = preg_replace( '/\?.+$/', '', $_SERVER["REQUEST_URI"] );
 	$handle = parse_url($url, PHP_URL_PATH);
 	// /で配列作成
-	$handle = explode('/',  $handle);
-*/
+	$handle = explode('/', $handle);
+	$uri .= $handle[1] . "/style.css";
 
+	*/
+
+/*
+テンプレートの種類毎にCSSを変更したい場合のサンプル
+*/
+/*
+	// CSSディレクトリ
+	$uri = get_template_directory_uri() . "/common/css/";
+
+	// トップページの場合
 	if ( is_home() ) {
 		$uri .= "top.css";
 
@@ -188,43 +235,44 @@ function my_enqueue_files() {
 		$uri .= "common.css";
 
 	}
-	wp_enqueue_style("style", $uri);
-}
-// ページ毎にCSSを変更したい場合
-// add_action('wp_enqueue_scripts', 'my_enqueue_files');
+*/
 
-/* ========================================================
-JSの読み込み
-=========================================================*/
-function custom_inline_script() {
+
+	// CSSディレクトリ
+	$uri = get_template_directory_uri() . "/style.css";
+	
+	// スタイルの出力
+	wp_enqueue_style("smart-style", $uri, array(), wp_get_theme()->get( 'Version' ));
+
+
+
+
 	// JSディレクトリ
-	$uri = "https://".$_SERVER["HTTP_HOST"]."/common/js/";
+	$uri = get_template_directory_uri() . "/common/js/";
+
 	if( is_home() ){
-		$uri .= 'top-dist.js';
+		$uri .= 'index.js';
 
 	// 詳細ページの場合
 	} else if( is_single() ){
-
-		$uri .= "single-dist.js";
+		$uri .= "single.js";
 
 	// カテゴリかタグ、カスタムタクソノミーのアーカイブページの場合
 	} else if( is_category() || is_tag() || is_tax() ){
-		$uri .= "category-dist.js";
+		$uri .= "category.js";
 
 	// エラーページの場合
 	} else if ( is_404() ){
-		$uri .= "error-dist.js";
-
+		$uri .= "error.js";
 
 	// 該当なし
 	} else {
-		$uri .= "common-dist.js";
+		$uri .= "common.js";
 	}
-	if( $uri !== null ){
-		echo '<script src="' . $uri . '"></script>';
-	}
+	wp_enqueue_script('smart-script', $uri, array(), wp_get_theme()->get( 'Version' ), true);
 }
-add_action( 'wp_footer' , 'custom_inline_script' );
+// ページ毎にCSSを変更したい場合
+add_action('wp_enqueue_scripts', 'smart_enqueue_files');
 
 
 /* ========================================================
@@ -251,3 +299,72 @@ function my_deregister_styles() {
 	// }
 }
 add_action( 'wp_enqueue_scripts', 'my_deregister_styles', 100 );
+
+
+/* ========================================================
+ページを表示する直前に実行
+=========================================================*/
+function smart_template_redirect() {
+	// フロントページが表示される前に行う処理
+	if ( is_front_page() ) {
+	// ブログメインページが表示される前に行う処理
+	} else if ( is_home() ) {
+	// カテゴリかタグ、カスタムタクソノミーのアーカイブページが表示される前に行う処理
+	} else if( is_category() || is_tag() || is_tax() ){
+	// 投稿ページが表示される前に行う処理
+	} else if ( is_single() ) {
+	// 固定ページが表示される前に行う処理
+	} else if ( is_page() ) {
+	// それ以外のページが表示される前に行う処理
+	} else {
+	}
+}
+add_action( 'template_redirect', 'smart_template_redirect' );
+
+
+/* ========================================================
+メインクエリの設定
+=========================================================*/
+function change_posts($query) {
+	/* 管理画面、メインクエリ以外に干渉しない */
+	if( is_admin() || ! $query->is_main_query() ) return;
+
+	/* TOPページ */
+	if ( $query->is_home() ) {
+		return;
+
+	/* Musicカテゴリーページ */
+	} else if ( $query->is_category($MUSIC_ID) ){
+		return;
+
+	/* HTMLやCSSなど親カテゴリーページ */
+	} else if ( $query->is_category($CATEGORY_PARENT) ){
+		return;
+
+	/* カテゴリーページ */
+	} else if ( $query->is_category() ){
+		return;
+
+	/* タグページ */
+	} else if ( $query->is_tag() ){
+		return;
+
+	/* タクソノミーページ */
+	} else if ( $query->is_tax() ){
+		return;
+
+	/* 詳細ページ */
+	} else if ( $query->is_single() ){
+		return;
+
+	/* 検索ページ */
+	} else if ( $query->is_search() ){
+		return;
+
+	/* 固定ページ */
+	} else if ( $query->is_page() ){
+		return;
+
+ 	}
+}
+add_action( 'pre_get_posts', 'change_posts' );

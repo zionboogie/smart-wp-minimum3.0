@@ -1,19 +1,16 @@
 /* ========================================================
 記事領域
 =========================================================*/
-.entrylist-contaier{
-	>.entry-header{
-		>.title{
-
+.entrylist-contaier {
+	padding: $mg;
+	> .entry-header {
+		> .title {
 		}
-		>.postdate{
-
+		> .postdate {
 		}
-		>.category-list{
-
+		> .category-list {
 		}
-		>.tag{
-
+		> .tag {
 		}
 	}
 }

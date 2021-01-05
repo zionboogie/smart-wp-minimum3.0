@@ -3,7 +3,7 @@
 パーツ：パンくず
 */
 ?>
-<div class="breadcrumb">
+<div class="breadcrumb-container">
 	<a href="<?php bloginfo('url'); ?>">Home</a>
 	<?php
 	if ( !$cat ) $cat = get_the_category();
