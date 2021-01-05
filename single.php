@@ -3,7 +3,8 @@
 詳細用テンプレート
 */
 // ヘッダの出力
-get_header(); ?>
+get_header(); 
+?>
 
 <!-- main -->
 <main class="main-container">

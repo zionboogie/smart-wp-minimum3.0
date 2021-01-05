@@ -8,7 +8,7 @@
 	<?php get_template_part( 'template-parts/content' ); ?>
 
 	<!-- entry-content -->
-	<section class="entry-content">
+	<section class="entry-container">
 		<?php the_content(); ?>
 		<?php wp_link_pages(); ?>
 	</section>
