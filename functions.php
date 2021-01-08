@@ -13,15 +13,14 @@
 #########################################################*/
 
 if ( ! function_exists( 'smart_theme_support' ) ) {
-	add_action( 'after_setup_theme', 'smart_theme_support' );
 	function smart_theme_support() {
-	
+
 		/* ========================================================
 		セキュリティ
 		=========================================================*/
 		// WordPressのバージョンを非表示
 		remove_action('wp_head','wp_generator');
-	
+
 		// プラグインのバージョン情報非表示
 		function remove_cssjs_ver2( $src ) {
 			// テーマ内のファイルは対象外
@@ -31,14 +30,14 @@ if ( ! function_exists( 'smart_theme_support' ) ) {
 		}
 		add_filter( 'style_loader_src', 'remove_cssjs_ver2', 9999 );
 		add_filter( 'script_loader_src', 'remove_cssjs_ver2', 9999 );
-	
+
 		// headタグのmeta（generator）タグを取り除く
 		foreach ( array( 'rss2_head', 'commentsrss2_head', 'rss_head', 'rdf_header',
 			'atom_head', 'comments_atom_head', 'opml_head', 'app_head' ) as $action ) {
 			if ( has_action( $action, 'the_generator' ) )
 				remove_action( $action, 'the_generator' );
 		}
-	
+
 		// コメント用のフィードを停止
 		if ( is_comment_feed() ) {
 			remove_action('do_feed_rdf', 'do_feed_rdf');
@@ -56,7 +55,7 @@ if ( ! function_exists( 'smart_theme_support' ) ) {
 
 		// Microsoftが提供するブログエディター「Windows Live Writer」を使用する際のマニフェストファイル
 		remove_action( 'wp_head', 'wlwmanifest_link' );
-	
+
 		// RSD用のxml（外部サービスを使ってサイトを運営する予定がある場合はコメントアウト）
 		remove_action('wp_head', 'rsd_link');
 
@@ -65,12 +64,14 @@ if ( ! function_exists( 'smart_theme_support' ) ) {
 		remove_action('wp_head','wp_oembed_add_discovery_links');
 		remove_action('wp_head','wp_oembed_add_host_js');
 
+
+
 		/* ========================================================
 		基本設定
 		=========================================================*/
 		// フィードのlink要素を自動出力する
 		add_theme_support( 'automatic-feed-links' );
-		
+
 		// ドキュメントのタイトルをWordPressに管理させる
 		// ドキュメントヘッドにハードコードされた<title>タグを使用しません。
 		// WordPressが提供してくれます。
@@ -102,7 +103,7 @@ if ( ! function_exists( 'smart_theme_support' ) ) {
 
 		// 投稿ページにてアイキャッチ画像の欄を表示
 		// add_theme_support( 'post-thumbnails' );
-	
+
 		// 投稿フォーマットのサポート
 		// add_theme_support( 'post-formats', array(
 		// 	'aside',	//アサイド
@@ -115,16 +116,21 @@ if ( ! function_exists( 'smart_theme_support' ) ) {
 		// 	'audio',	//音声
 		// 	'chat',		//チャット
 		// ) );
-	
+
 		// 記事の自動整形（ダブルクオーテーションなどの引用符など）を無効にする
 		add_filter( 'run_wptexturize', '__return_false' );
-	
 
-	
 	}
+	add_action( 'after_setup_theme', 'smart_theme_support' );
 }
 
-
+/* ========================================================
+コンテンツ幅の設定
+=========================================================*/
+function smart_content_width() {
+	$GLOBALS['content_width'] = apply_filters( 'smart_content_width', 750 );
+}
+add_action( 'after_setup_theme', 'smart_content_width', 0 );
 
 
 
@@ -240,7 +246,7 @@ function smart_enqueue_files() {
 
 	// CSSディレクトリ
 	$uri = get_template_directory_uri() . "/style.css";
-	
+
 	// スタイルの出力
 	wp_enqueue_style("smart-style", $uri, array(), wp_get_theme()->get( 'Version' ));
 

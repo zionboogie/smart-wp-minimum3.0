@@ -10,16 +10,13 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<!-- ファビコン -->
-	<link rel="shortcut icon" href="/favicon.ico" type="image/vnd.microsoft.ico">
-	<link rel="apple-touch-icon-precomposed" href="/favicon-152.png">
-
 	<?php if ( is_singular() && pings_open( get_queried_object() ) ) : ?>
 	<link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>">
 	<?php endif; ?>
 	<?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
+<?php wp_body_open(); ?>
 
 	<!-- ページヘッダ -->
 	<header class="site-header">

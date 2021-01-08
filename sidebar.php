@@ -30,4 +30,13 @@
 		</ul>
 	</aside>
 	<!-- /widget-archives -->
+
+<?php if ( is_active_sidebar( 'sidebar-1' ) ) : ?>
+	<!-- widget-dynamic -->
+	<aside class="widget-container -dynamic">
+		<?php dynamic_sidebar( 'sidebar-1' ); ?>
+	</aside>
+	<!-- /widget-dynamic -->
+<?php endif; ?>
+
 </div>

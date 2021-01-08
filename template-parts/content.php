@@ -4,7 +4,7 @@
 */
 ?>
 	<!-- entry-header -->
-	<div class="entry-header">
+	<div id="post-<?php the_ID(); ?>" <?php post_class("entry-header"); ?>>
 		<?php
 		// 記事タイトルの出力
 		the_title( sprintf( '<h2 class="title"><a href="%s">', esc_url( get_permalink() ) ), '</a></h2>' );
