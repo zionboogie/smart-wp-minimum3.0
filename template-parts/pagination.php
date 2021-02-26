@@ -23,4 +23,4 @@ $pg_navi	= paginate_links( array(
 ));
 ?>
 
-		<div class="pagination-navi"><?php echo $pg_navi; ?></div>
+		<div class="pagination-nav"><?php echo $pg_navi; ?></div>
