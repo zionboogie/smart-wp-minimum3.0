@@ -13,6 +13,7 @@ if ( strpos($paginate_base, '?') || ! $wp_rewrite->using_permalinks() ) {
 		. user_trailingslashit('page/%#%/', 'paged');
 	$paginate_base .= '%_%';
 }
+global $pg_navi;
 $pg_navi	= paginate_links( array(
 	'base'		=> $paginate_base,
 	'format'	=> $paginate_format,
