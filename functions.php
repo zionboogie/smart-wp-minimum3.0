@@ -196,7 +196,23 @@ add_action( 'widgets_init', 'smart_widgets_init' );
 CSSとJSの読み込み
 =========================================================*/
 function smart_enqueue_files() {
-/*
+
+	//管理画面系CSSの読み込み制限
+	if ( !is_admin() ){
+		wp_deregister_style( 'dashicons' );
+		wp_deregister_style( 'aioseop-toolbar-menu' );
+	}
+	//投稿用プラグインのCSS
+	if ( !is_single() ){
+		wp_deregister_style( 'toc-screen' );
+		wp_deregister_style( 'liquid-block-speech' );
+		wp_deregister_style( 'tablepress-default' );
+		wp_deregister_style( 'post-views-counter-frontend' );
+	}
+
+
+
+	/*
 ディレクトリ単位でCSSを変更したい場合のサンプル
 */
 /*
@@ -243,15 +259,16 @@ function smart_enqueue_files() {
 	}
 */
 
+	// 固定ページとシングルページはjQueryを読み込まない
+	// if ( is_page() || is_single() ) {
+		wp_deregister_script( 'jquery' );
+	// }
 
 	// CSSディレクトリ
 	$uri = get_template_directory_uri() . "/style.css";
 
 	// スタイルの出力
 	wp_enqueue_style("smart-style", $uri, array(), wp_get_theme()->get( 'Version' ));
-
-
-
 
 	// JSディレクトリ
 	$uri = get_template_directory_uri() . "/common/js/";
@@ -280,31 +297,6 @@ function smart_enqueue_files() {
 // ページ毎にCSSを変更したい場合
 add_action('wp_enqueue_scripts', 'smart_enqueue_files');
 
-
-/* ========================================================
-デフォルト読み込みのCSS・JSの読み込み制御
-=========================================================*/
-function my_deregister_styles() {
-	//管理画面系CSSの読み込み制限
-	if ( !is_admin() ){
-		wp_deregister_style( 'dashicons' );
-		wp_deregister_style( 'aioseop-toolbar-menu' );
-	}
-
-	//投稿用プラグインのCSS
-	if ( !is_single() ){
-		wp_deregister_style( 'toc-screen' );
-		wp_deregister_style( 'liquid-block-speech' );
-		wp_deregister_style( 'tablepress-default' );
-		wp_deregister_style( 'post-views-counter-frontend' );
-	}
-
-	// 固定ページとシングルページはjQueryを読み込まない
-	// if ( is_page() || is_single() ) {
-		wp_deregister_script( 'jquery' );
-	// }
-}
-add_action( 'wp_enqueue_scripts', 'my_deregister_styles', 100 );
 
 
 /* ========================================================
